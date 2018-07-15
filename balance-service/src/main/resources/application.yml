@@ -1,0 +1,13 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: microservice-consumer-movie
+  rabbitmq:
+    host: localhost
+    port: 30000
+    username: guest
+    password: guest
+agency-service:
+  ribbon:
+    listOfServers: localhost:8091

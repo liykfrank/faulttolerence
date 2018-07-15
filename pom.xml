@@ -10,5 +10,6 @@
   <modules>
     <module>agency-service</module>
     <module>salesdata-service</module>
+    <module>balance-service</module>
   </modules>
 </project>
