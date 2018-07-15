@@ -6,11 +6,12 @@
   <artifactId>faulttolerence-parent</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-
   <modules>
     <module>agency-service</module>
     <module>salesdata-service</module>
     <module>balance-service</module>
     <module>risk-service</module>
+    <module>hystrix-dashboard</module>
+    <module>hystrix-turbine-mq</module>
   </modules>
 </project>

@@ -1,0 +1,10 @@
+server:
+  port: 8031
+spring:
+  application:
+    name: microservice-hystrix-turbine
+  rabbitmq:
+    host: localhost
+    port: 30000
+    username: guest
+    password: guest
