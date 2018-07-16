@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @EnableCircuitBreaker
-public class ConsumerMovieApplication {
+public class BalanceApplication {
   @Bean
   @LoadBalanced
   public RestTemplate restTemplate() {
@@ -17,6 +17,6 @@ public class ConsumerMovieApplication {
   }
 
   public static void main(String[] args) {
-    SpringApplication.run(ConsumerMovieApplication.class, args);
+    SpringApplication.run(BalanceApplication.class, args);
   }
 }

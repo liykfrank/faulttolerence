@@ -226,36 +226,66 @@ For the data persistence a in-memory H2 database was used.
 The following is the dependencies used in this project:
 
 ```xml
+  <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-ribbon</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-hystrix</artifactId>
+    </dependency>
+     <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-netflix-hystrix-stream</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+    </dependency>
+  </dependencies>
 ```
 
 To enable loading of the `DiscoveryClient`, add `@EnableDiscoveryClient` to the according configuration or application class like this:
 
 ```java
+@SpringBootApplication
+@EnableCircuitBreaker
+public class BalanceApplication {
+  @Bean
+  @LoadBalanced
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(BalanceApplication.class, args);
+  }
+}
+```
+
+```java
 @RestController
 public class Controller {
-  @Autowired
-  private AgencyRepository agencyRepository;
-
-  @GetMapping("/{id}")
+  @HystrixCommand(fallbackMethod = "findByIdFallback")
+  @GetMapping("/agency/{id}")
   public Agency findById(@PathVariable Long id) {
-    Agency findOne = this.agencyRepository.findOne(id);
-    return findOne;
+    return this.restTemplate.getForObject("http://agency-service/" + id, Agency.class);
+  }
+  
+  public Agency findByIdFallback(Long id) {
+    Agency agency = new Agency();
+    agency.setId(-1L);
+    agency.setName("Can not connect to agency-service");
+    return agency;
   }
 }
 ```
@@ -264,19 +294,18 @@ Here is the configuration in `application
 
 ```
 server:
-  port: 8091
+  port: 8081
 spring:
   application:
-    name: agency-service
-  jpa:
-    generate-ddl: false
-    show-sql: true
-    hibernate:
-      ddl-auto: none
-  datasource:                           
-    platform: h2                       
-    schema: classpath:schema.sql       
-    data: classpath:data.sql
+    name: balance-service
+  rabbitmq:
+    host: localhost
+    port: 30000
+    username: guest
+    password: guest
+agency-service:
+  ribbon:
+    listOfServers: localhost:8091
 ```
 You could build and run this application follow below  steps:
 - Go to agency-service directory

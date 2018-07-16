@@ -2,12 +2,12 @@ package com.frank.demo.entity;
 
 import java.math.BigDecimal;
 
-public class User {
-  private Long id;
-  private String username;
-  private String name;
-  private Integer age;
-  private BigDecimal balance;
+
+public class Agency {
+	private Long id;
+	private String name;
+
+	private BigDecimal balance;
 
   public Long getId() {
     return this.id;
@@ -17,13 +17,6 @@ public class User {
     this.id = id;
   }
 
-  public String getUsername() {
-    return this.username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
 
   public String getName() {
     return this.name;
@@ -31,14 +24,6 @@ public class User {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public Integer getAge() {
-    return this.age;
-  }
-
-  public void setAge(Integer age) {
-    this.age = age;
   }
 
   public BigDecimal getBalance() {
