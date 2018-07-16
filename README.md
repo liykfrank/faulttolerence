@@ -77,7 +77,7 @@ The application used in this pipeline is a JAX-RS application which is available
     http://localhost:8091/1
 
     And you will get something like this:
-
+![](images/agency.png?raw=true)
 
 This service is nothing more than an ordinary spring boot application:
 For the data persistence a in-memory H2 database was used.     
@@ -117,15 +117,7 @@ public class Controller {
   }
 }
 ```
-
-Then you can inject the client in your code simply by:
-
-```java
-@Autowired
-private DiscoveryClient discoveryClient;
-```
-
-If for any reason you need to disable the `DiscoveryClient` you can simply set the following property in `application
+Here is the configuration in `application
 .properties`:
 
 ```
