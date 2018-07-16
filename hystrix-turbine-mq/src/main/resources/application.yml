@@ -2,7 +2,7 @@ server:
   port: 8031
 spring:
   application:
-    name: microservice-hystrix-turbine
+    name: hystrix-turbine-mq
   rabbitmq:
     host: localhost
     port: 30000
