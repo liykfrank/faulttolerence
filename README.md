@@ -307,7 +307,8 @@ agency-service:
   ribbon:
     listOfServers: localhost:8091
 ```
-You could build and run this application follow below  steps:
+You could build and run this application follow below steps:
+As this service depends on Agency service, you may need to run Agency service first.
 - Go to agency-service directory
 ```
 cd agency-service
@@ -318,12 +319,16 @@ mvn clean package
 ```
 - Run this service
 ```
-java -jar target/agency-service-0.0.1-SNAPSHOT.jar
+java -jar target/balance-service-0.0.1-SNAPSHOT.jar
 ```
 
 - Then you could test this service with below link:
-http://localhost:8091/1
+http://localhost:8081/agency/1
 
 And you will get something like this:
 
-![](images/agency.png?raw=true)
+![](images/balance-success.png?raw=true)
+
+In case of Agency service is out of service, you wiill have something like this:
+![](images/balance-fallback.png?raw=true)
+And this proves that the fallback of Hystrix is working well.
