@@ -5,17 +5,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.frank.demo.entity.User;
-import com.frank.demo.repository.UserRepository;
+import com.frank.demo.entity.Agency;
+import com.frank.demo.repository.AgencyRepository;
 
 @RestController
 public class Controller {
   @Autowired
-  private UserRepository userRepository;
+  private AgencyRepository agencyRepository;
 
   @GetMapping("/{id}")
-  public User findById(@PathVariable Long id) {
-    User findOne = this.userRepository.findOne(id);
+  public Agency findById(@PathVariable Long id) {
+    Agency findOne = this.agencyRepository.findOne(id);
     return findOne;
   }
 }
