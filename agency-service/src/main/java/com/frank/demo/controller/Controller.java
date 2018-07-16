@@ -9,7 +9,7 @@ import com.frank.demo.entity.User;
 import com.frank.demo.repository.UserRepository;
 
 @RestController
-public class UserController {
+public class Controller {
   @Autowired
   private UserRepository userRepository;
 

@@ -79,8 +79,9 @@ The application used in this pipeline is a JAX-RS application which is available
     And you will get something like this:
 
 
-    
-This is something that you get for free just by adding the following dependency inside your project:
+This service is nothing more than an ordinary spring boot application:
+For the data persistence a in-memory H2 database was used.     
+The following is the dependencies used in this project:
 
 ```xml
     <dependency>

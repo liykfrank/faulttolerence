@@ -7,7 +7,7 @@
 	</configSuffixes>
 	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
-		<config>java:com.frank.demo.ProviderUserApplication</config>
+		<config>java:com.frank.demo.Application</config>
 	</configs>
 	<autoconfigs>
 	</autoconfigs>
