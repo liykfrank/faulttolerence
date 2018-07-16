@@ -105,11 +105,15 @@ The following is the dependencies used in this project:
 To enable loading of the `DiscoveryClient`, add `@EnableDiscoveryClient` to the according configuration or application class like this:
 
 ```java
-@SpringBootApplication
-@EnableDiscoveryClient
-public class Application {  
-  public static void main(String[] args) {
-    SpringApplication.run(Application.class, args);
+@RestController
+public class Controller {
+  @Autowired
+  private AgencyRepository agencyRepository;
+
+  @GetMapping("/{id}")
+  public Agency findById(@PathVariable Long id) {
+    Agency findOne = this.agencyRepository.findOne(id);
+    return findOne;
   }
 }
 ```
