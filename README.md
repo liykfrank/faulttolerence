@@ -31,8 +31,15 @@ Hystrix integration with Turbine via RabbitMQ
 
 This project provides an implementation of circuit breaker with hystrix. Further more it will leverage turbine to gather the distributted hystrix stream informations. This allows you to monitor all of the hystrix status easily. Each application instance pushes the metrics from Hystrix commands to Turbine through a central RabbitMQ broker.
 
+The demo includes 6 applications, 4 fucntion services and 2 infrastructure services:
 
-The following diagram shows the communication model:
+![](images/comps.png?raw=true)
+
+Below diagram explains the dependencies and communications of above services  
+
+![](images/hystrix.png?raw=true)
+
+The following diagram shows the communication model of Spring Cloud Turbine AMQP:
 
 ![](images/turbineamqp.png?raw=true)
 
