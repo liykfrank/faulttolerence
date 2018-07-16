@@ -129,7 +129,20 @@ If for any reason you need to disable the `DiscoveryClient` you can simply set t
 .properties`:
 
 ```
-spring.cloud.kubernetes.discovery.enabled=false
+server:
+  port: 8091
+spring:
+  application:
+    name: agency-service
+  jpa:
+    generate-ddl: false
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+  datasource:                           
+    platform: h2                       
+    schema: classpath:schema.sql       
+    data: classpath:data.sql
 ```
 
 [//]: # "TODO: make clearer with an example and details on how to align service and application name"
