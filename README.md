@@ -20,7 +20,7 @@ Hystrix integration with Turbine via RabbitMQ
 
 * [Agency Service](#agency-service)
 * [Salesdata Service](#salesdata-service)
-* [Demo Guide](#demo-guide)
+* [Balance Service](#balance-service)
 * [Demo Guide](#demo-guide)
 * [Demo Guide](#demo-guide)
 * [Demo Guide](#demo-guide)
@@ -140,6 +140,86 @@ And you will get something like this:
 ![](images/agency.png?raw=true)
 
 ## Salesdata Service
+
+This service is nothing more than an ordinary spring boot application:
+For the data persistence a in-memory H2 database was used.     
+The following is the dependencies used in this project:
+
+```xml
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+```
+
+To enable loading of the `DiscoveryClient`, add `@EnableDiscoveryClient` to the according configuration or application class like this:
+
+```java
+@RestController
+public class Controller {
+  @Autowired
+  private AgencyRepository agencyRepository;
+
+  @GetMapping("/{id}")
+  public Agency findById(@PathVariable Long id) {
+    Agency findOne = this.agencyRepository.findOne(id);
+    return findOne;
+  }
+}
+```
+Here is the configuration in `application
+.properties`:
+
+```
+server:
+  port: 8092
+spring:
+  application:
+    name: salesdata-service
+  jpa:
+    generate-ddl: false
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+  datasource:                           
+    platform: h2                        
+    schema: classpath:schema.sql        
+    data: classpath:data.sql
+```
+You could build and run this application follow below  steps:
+- Go to agency-service directory
+```
+cd agency-service
+```
+- Compile with maven
+```
+mvn clean package
+```
+- Run this service
+```
+java -jar target/salesdata-service-0.0.1-SNAPSHOT.jar
+```
+
+- Then you could test this service with below link:
+http://localhost:8091/1
+
+And you will get something like this:
+
+![](images/salesdata.png?raw=true)
+
+## Balance Service
 
 This service is nothing more than an ordinary spring boot application:
 For the data persistence a in-memory H2 database was used.     
