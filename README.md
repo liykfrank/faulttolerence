@@ -18,7 +18,7 @@ Hystrix integration with Turbine via RabbitMQ
 * [Introduction](#introduction)
 * [Prerequisites](#prerequisites)
 
-* [Demo Guide](#demo-guide)
+* [Agency Service](#agency-service)
 * [Demo Guide](#demo-guide)
 * [Demo Guide](#demo-guide)
 * [Demo Guide](#demo-guide)
@@ -58,6 +58,70 @@ The application used in this pipeline is a JAX-RS application which is available
   
 
 * The web console could be accessed with http://localhost:30001 with guest/guest
+
+## Agency Service
+
+1. A Jenkins pipeline is pre-configured which clones Tasks application source code from Gogs (running on OpenShift), builds, deploys and promotes the result through the deployment pipeline. In the CI/CD project, click on _Builds_ and then _Pipelines_ to see the list of defined pipelines.
+
+    Click on _tasks-pipeline_ and _Configuration_ and explore the pipeline definition.
+
+    You can also explore the pipeline job in Jenkins by clicking on the Jenkins route url, logging in with the OpenShift credentials and clicking on _tasks-pipeline_ and _Configure_.
+
+    go to agency-service directory via cd agency-service.
+    compile with maven
+    mvn clean package
+
+    Run this service, java -jar target/agency-service-0.0.1-SNAPSHOT.jar
+
+    Then you could test this service with below link:
+    http://localhost:8091/1
+
+    And you will get something like this:
+
+
+    
+This is something that you get for free just by adding the following dependency inside your project:
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-kubernetes</artifactId>
+    <version>${latest.version}</version>
+</dependency>
+```
+
+To enable loading of the `DiscoveryClient`, add `@EnableDiscoveryClient` to the according configuration or application class like this:
+
+```java
+@SpringBootApplication
+@EnableDiscoveryClient
+public class Application {  
+  public static void main(String[] args) {
+    SpringApplication.run(Application.class, args);
+  }
+}
+```
+
+Then you can inject the client in your code simply by:
+
+```java
+@Autowired
+private DiscoveryClient discoveryClient;
+```
+
+If for any reason you need to disable the `DiscoveryClient` you can simply set the following property in `application
+.properties`:
+
+```
+spring.cloud.kubernetes.discovery.enabled=false
+```
+
+[//]: # "TODO: make clearer with an example and details on how to align service and application name"
+
+Some Spring Cloud components use the `DiscoveryClient` in order to obtain info about the local service instance. For 
+this to work you need to align the service name with the `spring.application.name` property.
+
+2. Run an instance of the pipeline by starting the _tasks-pipeline_ in OpenShift or Jenkins.
 
 ## Deploy on RHPDS
 
