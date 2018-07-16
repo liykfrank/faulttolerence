@@ -61,25 +61,6 @@ The application used in this pipeline is a JAX-RS application which is available
 
 ## Agency Service
 
-1. A Jenkins pipeline is pre-configured which clones Tasks application source code from Gogs (running on OpenShift), builds, deploys and promotes the result through the deployment pipeline. In the CI/CD project, click on _Builds_ and then _Pipelines_ to see the list of defined pipelines.
-
-    Click on _tasks-pipeline_ and _Configuration_ and explore the pipeline definition.
-
-    You can also explore the pipeline job in Jenkins by clicking on the Jenkins route url, logging in with the OpenShift credentials and clicking on _tasks-pipeline_ and _Configure_.
-
-    go to agency-service directory via cd agency-service.
-    compile with maven
-    mvn clean package
-
-Run this service, java -jar target/agency-service-0.0.1-SNAPSHOT.jar
-
-Then you could test this service with below link:
-http://localhost:8091/1
-
-And you will get something like this:
-
-![](images/agency.png?raw=true)
-
 This service is nothing more than an ordinary spring boot application:
 For the data persistence a in-memory H2 database was used.     
 The following is the dependencies used in this project:
@@ -137,11 +118,26 @@ spring:
     schema: classpath:schema.sql       
     data: classpath:data.sql
 ```
+You could build and run this application follow below  steps:
+- Go to agency-service directory
+```
+cd agency-service
+```
+- Compile with maven
+```
+mvn clean package
+```
+- Run this service
+```
+java -jar target/agency-service-0.0.1-SNAPSHOT.jar
+```
 
-[//]: # "TODO: make clearer with an example and details on how to align service and application name"
+- Then you could test this service with below link:
+http://localhost:8091/1
 
-Some Spring Cloud components use the `DiscoveryClient` in order to obtain info about the local service instance. For 
-this to work you need to align the service name with the `spring.application.name` property.
+And you will get something like this:
+
+![](images/agency.png?raw=true)
 
 2. Run an instance of the pipeline by starting the _tasks-pipeline_ in OpenShift or Jenkins.
 
