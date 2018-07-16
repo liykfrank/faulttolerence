@@ -28,15 +28,15 @@ public class RiskController {
   }
   
   public SalesData findByIdFallback(Long id) {
-	    SalesData SalesData = new SalesData();
-	    SalesData.setId(-1L);
-	    SalesData.setAgencyCode("Can not connect to microservice-provider-SalesData");
-	    return SalesData;
-	  }
+    SalesData SalesData = new SalesData();
+    SalesData.setId(-1L);
+    SalesData.setAgencyCode("Can not connect to salesdata-service");
+    return SalesData;
+  }
 
   @GetMapping("/log-SalesData-instance")
   public void logSalesDataInstance() {
-    ServiceInstance serviceInstance = this.loadBalancerClient.choose("microservice-provider-SalesData");
+    ServiceInstance serviceInstance = this.loadBalancerClient.choose("salesdata-service");
     // 打印当前选择的是哪个节点
     RiskController.LOGGER.info("{}:{}:{}", serviceInstance.getServiceId(), serviceInstance.getHost(), serviceInstance.getPort());
   }

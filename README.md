@@ -170,11 +170,11 @@ To enable loading of the `DiscoveryClient`, add `@EnableDiscoveryClient` to the 
 @RestController
 public class Controller {
   @Autowired
-  private AgencyRepository agencyRepository;
+  private SalesDataRepository userRepository;
 
   @GetMapping("/{id}")
-  public Agency findById(@PathVariable Long id) {
-    Agency findOne = this.agencyRepository.findOne(id);
+  public SalesData findById(@PathVariable Long id) {
+    SalesData findOne = this.userRepository.findOne(id);
     return findOne;
   }
 }
@@ -213,11 +213,11 @@ java -jar target/salesdata-service-0.0.1-SNAPSHOT.jar
 ```
 
 - Then you could test this service with below link:
-http://localhost:8091/1
+http://localhost:8092/1
 
 And you will get something like this:
 
-![](images/salesdata.png?raw=true)
+![](images/sales.png?raw=true)
 
 ## Balance Service
 
@@ -375,7 +375,7 @@ To enable loading of the `DiscoveryClient`, add `@EnableDiscoveryClient` to the 
 ```java
 @SpringBootApplication
 @EnableCircuitBreaker
-public class BalanceApplication {
+public class RiskApplication {
   @Bean
   @LoadBalanced
   public RestTemplate restTemplate() {
@@ -383,45 +383,42 @@ public class BalanceApplication {
   }
 
   public static void main(String[] args) {
-    SpringApplication.run(BalanceApplication.class, args);
+    SpringApplication.run(RiskApplication.class, args);
   }
 }
 ```
 
 ```java
-@RestController
-public class Controller {
   @HystrixCommand(fallbackMethod = "findByIdFallback")
-  @GetMapping("/agency/{id}")
-  public Agency findById(@PathVariable Long id) {
-    return this.restTemplate.getForObject("http://agency-service/" + id, Agency.class);
+  @GetMapping("/sales/{id}")
+  public SalesData findById(@PathVariable Long id) {
+    return this.restTemplate.getForObject("http://salesdata-service/" + id, SalesData.class);
   }
   
-  public Agency findByIdFallback(Long id) {
-    Agency agency = new Agency();
-    agency.setId(-1L);
-    agency.setName("Can not connect to agency-service");
-    return agency;
+  public SalesData findByIdFallback(Long id) {
+    SalesData SalesData = new SalesData();
+    SalesData.setId(-1L);
+    SalesData.setAgencyCode("Can not connect to microservice-provider-SalesData");
+    return SalesData;
   }
-}
 ```
 Here is the configuration in `application
 .properties`:
 
 ```
 server:
-  port: 8081
+  port: 8082
 spring:
   application:
-    name: balance-service
+    name: risk-service
   rabbitmq:
     host: localhost
     port: 30000
     username: guest
     password: guest
-agency-service:
+salesdata-service:
   ribbon:
-    listOfServers: localhost:8091
+    listOfServers: localhost:8092
 ```
 You could build and run this application follow below steps:
 As this service depends on Agency service, you may need to run Agency service first.
@@ -435,18 +432,18 @@ mvn clean package
 ```
 - Run this service
 ```
-java -jar target/balance-service-0.0.1-SNAPSHOT.jar
+java -jar target/risk-service-0.0.1-SNAPSHOT.jar
 ```
 
 - Then you could test this service with below link:
-http://localhost:8081/agency/1
+http://localhost:8082/sales/1
 
 And you will get something like this:
 
-![](images/balance-success.png?raw=true)
+![](images/risk.png?raw=true)
 
 In case of Agency service is out of service, you wiill have something like this:
-![](images/balance-fallback.png?raw=true)
+![](images/riskfallback.png?raw=true)
 
 
 And this proves that the fallback of Hystrix is working well.

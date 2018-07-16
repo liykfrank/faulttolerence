@@ -10,38 +10,37 @@ import javax.persistence.Id;
 
 @Entity
 public class SalesData {
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
-  @Column(name="agencyCode")
-  private String agencyCode;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+	@Column(name = "agencyCode")
+	private String agencyCode;
 
-  @Column
-  private BigDecimal amount;
+	public String getAgencyCode() {
+		return agencyCode;
+	}
 
-  public Long getId() {
-    return this.id;
-  }
+	public void setAgencyCode(String agencyCode) {
+		this.agencyCode = agencyCode;
+	}
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+	@Column
+	private BigDecimal amount;
 
-  public String getUsername() {
-    return this.agencyCode;
-  }
+	public Long getId() {
+		return this.id;
+	}
 
-  public void setUsername(String username) {
-    this.agencyCode = username;
-  }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
+	public BigDecimal getAmount() {
+		return amount;
+	}
 
-  public BigDecimal getBalance() {
-    return this.amount;
-  }
-
-  public void setBalance(BigDecimal balance) {
-    this.amount = balance;
-  }
+	public void setAmount(BigDecimal amount) {
+		this.amount = amount;
+	}
 
 }
