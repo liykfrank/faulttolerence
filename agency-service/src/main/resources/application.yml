@@ -2,7 +2,7 @@ server:
   port: 8091
 spring:
   application:
-    name: microservice-provider-user
+    name: agency-service
   jpa:
     generate-ddl: false
     show-sql: true
