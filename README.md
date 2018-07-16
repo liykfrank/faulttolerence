@@ -21,9 +21,9 @@ Hystrix integration with Turbine via RabbitMQ
 * [Agency Service](#agency-service)
 * [Salesdata Service](#salesdata-service)
 * [Balance Service](#balance-service)
-* [Demo Guide](#demo-guide)
-* [Demo Guide](#demo-guide)
-* [Demo Guide](#demo-guide)
+* [Risk Service](#risk-service)
+* [Turbine Service](#turbine-service)
+* [Hystrix Service](#hystrix-service)
 
 
 
@@ -331,4 +331,357 @@ And you will get something like this:
 
 In case of Agency service is out of service, you wiill have something like this:
 ![](images/balance-fallback.png?raw=true)
+
+
+And this proves that the fallback of Hystrix is working well.
+
+## Risk Service
+
+This service is nothing more than an ordinary spring boot application:
+For the data persistence a in-memory H2 database was used.     
+The following is the dependencies used in this project:
+
+```xml
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-ribbon</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-hystrix</artifactId>
+    </dependency>
+     <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-netflix-hystrix-stream</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+    </dependency>
+  </dependencies>
+```
+
+To enable loading of the `DiscoveryClient`, add `@EnableDiscoveryClient` to the according configuration or application class like this:
+
+```java
+@SpringBootApplication
+@EnableCircuitBreaker
+public class BalanceApplication {
+  @Bean
+  @LoadBalanced
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(BalanceApplication.class, args);
+  }
+}
+```
+
+```java
+@RestController
+public class Controller {
+  @HystrixCommand(fallbackMethod = "findByIdFallback")
+  @GetMapping("/agency/{id}")
+  public Agency findById(@PathVariable Long id) {
+    return this.restTemplate.getForObject("http://agency-service/" + id, Agency.class);
+  }
+  
+  public Agency findByIdFallback(Long id) {
+    Agency agency = new Agency();
+    agency.setId(-1L);
+    agency.setName("Can not connect to agency-service");
+    return agency;
+  }
+}
+```
+Here is the configuration in `application
+.properties`:
+
+```
+server:
+  port: 8081
+spring:
+  application:
+    name: balance-service
+  rabbitmq:
+    host: localhost
+    port: 30000
+    username: guest
+    password: guest
+agency-service:
+  ribbon:
+    listOfServers: localhost:8091
+```
+You could build and run this application follow below steps:
+As this service depends on Agency service, you may need to run Agency service first.
+- Go to agency-service directory
+```
+cd agency-service
+```
+- Compile with maven
+```
+mvn clean package
+```
+- Run this service
+```
+java -jar target/balance-service-0.0.1-SNAPSHOT.jar
+```
+
+- Then you could test this service with below link:
+http://localhost:8081/agency/1
+
+And you will get something like this:
+
+![](images/balance-success.png?raw=true)
+
+In case of Agency service is out of service, you wiill have something like this:
+![](images/balance-fallback.png?raw=true)
+
+
+And this proves that the fallback of Hystrix is working well.
+
+
+## Turbine Service
+
+This service is nothing more than an ordinary spring boot application:
+For the data persistence a in-memory H2 database was used.     
+The following is the dependencies used in this project:
+
+```xml
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-ribbon</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-hystrix</artifactId>
+    </dependency>
+     <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-netflix-hystrix-stream</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+    </dependency>
+  </dependencies>
+```
+
+To enable loading of the `DiscoveryClient`, add `@EnableDiscoveryClient` to the according configuration or application class like this:
+
+```java
+@SpringBootApplication
+@EnableCircuitBreaker
+public class BalanceApplication {
+  @Bean
+  @LoadBalanced
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(BalanceApplication.class, args);
+  }
+}
+```
+
+```java
+@RestController
+public class Controller {
+  @HystrixCommand(fallbackMethod = "findByIdFallback")
+  @GetMapping("/agency/{id}")
+  public Agency findById(@PathVariable Long id) {
+    return this.restTemplate.getForObject("http://agency-service/" + id, Agency.class);
+  }
+  
+  public Agency findByIdFallback(Long id) {
+    Agency agency = new Agency();
+    agency.setId(-1L);
+    agency.setName("Can not connect to agency-service");
+    return agency;
+  }
+}
+```
+Here is the configuration in `application
+.properties`:
+
+```
+server:
+  port: 8081
+spring:
+  application:
+    name: balance-service
+  rabbitmq:
+    host: localhost
+    port: 30000
+    username: guest
+    password: guest
+agency-service:
+  ribbon:
+    listOfServers: localhost:8091
+```
+You could build and run this application follow below steps:
+As this service depends on Agency service, you may need to run Agency service first.
+- Go to agency-service directory
+```
+cd agency-service
+```
+- Compile with maven
+```
+mvn clean package
+```
+- Run this service
+```
+java -jar target/balance-service-0.0.1-SNAPSHOT.jar
+```
+
+- Then you could test this service with below link:
+http://localhost:8081/agency/1
+
+And you will get something like this:
+
+![](images/balance-success.png?raw=true)
+
+In case of Agency service is out of service, you wiill have something like this:
+![](images/balance-fallback.png?raw=true)
+
+
+And this proves that the fallback of Hystrix is working well.
+
+
+
+## Hystrix Service
+
+This service is nothing more than an ordinary spring boot application:
+For the data persistence a in-memory H2 database was used.     
+The following is the dependencies used in this project:
+
+```xml
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-ribbon</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-hystrix</artifactId>
+    </dependency>
+     <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-netflix-hystrix-stream</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+    </dependency>
+  </dependencies>
+```
+
+To enable loading of the `DiscoveryClient`, add `@EnableDiscoveryClient` to the according configuration or application class like this:
+
+```java
+@SpringBootApplication
+@EnableCircuitBreaker
+public class BalanceApplication {
+  @Bean
+  @LoadBalanced
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(BalanceApplication.class, args);
+  }
+}
+```
+
+```java
+@RestController
+public class Controller {
+  @HystrixCommand(fallbackMethod = "findByIdFallback")
+  @GetMapping("/agency/{id}")
+  public Agency findById(@PathVariable Long id) {
+    return this.restTemplate.getForObject("http://agency-service/" + id, Agency.class);
+  }
+  
+  public Agency findByIdFallback(Long id) {
+    Agency agency = new Agency();
+    agency.setId(-1L);
+    agency.setName("Can not connect to agency-service");
+    return agency;
+  }
+}
+```
+Here is the configuration in `application
+.properties`:
+
+```
+server:
+  port: 8081
+spring:
+  application:
+    name: balance-service
+  rabbitmq:
+    host: localhost
+    port: 30000
+    username: guest
+    password: guest
+agency-service:
+  ribbon:
+    listOfServers: localhost:8091
+```
+You could build and run this application follow below steps:
+As this service depends on Agency service, you may need to run Agency service first.
+- Go to agency-service directory
+```
+cd agency-service
+```
+- Compile with maven
+```
+mvn clean package
+```
+- Run this service
+```
+java -jar target/balance-service-0.0.1-SNAPSHOT.jar
+```
+
+- Then you could test this service with below link:
+http://localhost:8081/agency/1
+
+And you will get something like this:
+
+![](images/hystrixdashboard.png?raw=true)
+
+In case of Agency service is out of service, you wiill have something like this:
+![](images/balance-fallback.png?raw=true)
+
+
 And this proves that the fallback of Hystrix is working well.
