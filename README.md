@@ -71,12 +71,13 @@ The application used in this pipeline is a JAX-RS application which is available
     compile with maven
     mvn clean package
 
-    Run this service, java -jar target/agency-service-0.0.1-SNAPSHOT.jar
+Run this service, java -jar target/agency-service-0.0.1-SNAPSHOT.jar
 
-    Then you could test this service with below link:
-    http://localhost:8091/1
+Then you could test this service with below link:
+http://localhost:8091/1
 
-    And you will get something like this:
+And you will get something like this:
+
 ![](images/agency.png?raw=true)
 
 This service is nothing more than an ordinary spring boot application:
