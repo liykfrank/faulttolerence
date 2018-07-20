@@ -1,14 +1,3 @@
-# faulttolerence
-//    docker run -d -it --name rabbit --hostname rabbit -p 30000:5672 -p 30001:15672 rabbitmq:management
-//
-//      998  docker run -d -it --name es -p 9200:9200 -p 9300:9300 elasticsearch
-//  999  docker run -d -it --name kibana --link es:elasticsearch -p 5601:5601 kibana
-
-//docker inspect --format '{{ .NetworkSettings.IPAddress }}' 8570b38e5877
- //  docker inspect --format '{{ .NetworkSettings.IPAddress }}'  36ba0255c836
-//    docker run -d -it --name logstash logstash -e 'input { rabbitmq { host => "172.17.0.2" port => 5672 queue => "helloq"  durable => true } }  output { elasticsearch { hosts => ["172.17.0.3"] } }'
-*For other versions of OpenShift, follow the instructions in the corresponding branch e.g. ocp-3.9, ocp-3.7, etc
-
 # Fault tolerence - Hystrix and Turbine with RabbitMQ 
 
 Hystrix integration with Turbine via RabbitMQ
@@ -30,12 +19,8 @@ Hystrix integration with Turbine via RabbitMQ
 ## Introduction
 
 This project provides an implementation of circuit breaker with hystrix. Further more it will leverage turbine to gather the distributted hystrix stream informations. This allows you to monitor all of the hystrix status easily. Each application instance pushes the metrics from Hystrix commands to Turbine through a central RabbitMQ broker.
-
+![](images/func.png?raw=true)
 The demo includes 6 applications, 4 fucntion services and 2 infrastructure services:
-
-![](images/comps.png?raw=true)
-
-Below diagram explains the dependencies and communications of above services  
 
 ![](images/hystrix.png?raw=true)
 
@@ -60,6 +45,189 @@ The application used in this pipeline is a JAX-RS application which is available
 * The web console could be accessed with http://localhost:30001 with guest/guest
 
 ## Agency Service
+### How to run
+You could build and run this application follow below  steps:
+- Go to agency-service directory
+```
+cd agency-service
+```
+- Compile with maven
+```
+mvn clean package
+```
+- Run this service
+```
+java -jar target/agency-service-0.0.1-SNAPSHOT.jar
+```
+
+- Then you could test this service with below link:
+http://localhost:8091/1
+
+And you will get something like this:
+
+![](images/agency.png?raw=true)
+
+## Salesdata Service
+### How to run
+
+You could build and run this application follow below  steps:
+- Go to agency-service directory
+```
+cd salesdata-service
+```
+- Compile with maven
+```
+mvn clean package
+```
+- Run this service
+```
+java -jar target/salesdata-service-0.0.1-SNAPSHOT.jar
+```
+
+- Then you could test this service with below link:
+http://localhost:8092/1
+
+And you will get something like this:
+
+![](images/sales.png?raw=true)
+
+## Balance Service
+
+You could build and run this application follow below steps:
+As this service depends on Agency service, you may need to run Agency service first.
+- Go to agency-service directory
+```
+cd agency-service
+```
+- Compile with maven
+```
+mvn clean package
+```
+- Run this service
+```
+java -jar target/balance-service-0.0.1-SNAPSHOT.jar
+```
+
+- Then you could test this service with below link:
+http://localhost:8081/agency/1
+
+And you will get something like this:
+
+![](images/balance-success.png?raw=true)
+
+In case of Agency service is out of service, you wiill have something like this:
+![](images/balance-fallback.png?raw=true)
+
+
+And this proves that the fallback of Hystrix is working well.
+
+## Risk Service
+
+You could build and run this application follow below steps:
+As this service depends on Agency service, you may need to run Agency service first.
+- Go to agency-service directory
+```
+cd agency-service
+```
+- Compile with maven
+```
+mvn clean package
+```
+- Run this service
+```
+java -jar target/risk-service-0.0.1-SNAPSHOT.jar
+```
+
+- Then you could test this service with below link:
+http://localhost:8082/sales/1
+
+And you will get something like this:
+
+![](images/risk.png?raw=true)
+
+In case of Agency service is out of service, you wiill have something like this:
+![](images/riskfallback.png?raw=true)
+
+
+And this proves that the fallback of Hystrix is working well.
+
+
+## Turbine Service
+
+
+
+You could build and run this application follow below steps:
+As this service depends on Agency service, you may need to run Agency service first.
+- Go to agency-service directory
+```
+cd agency-service
+```
+- Compile with maven
+```
+mvn clean package
+```
+- Run this service
+```
+java -jar target/hystrix-turbine-mq-0.0.1-SNAPSHOT.jar
+```
+
+- Then you could test this service with below link:
+http://localhost:8031/turbine.stream
+
+And you will get something like this:
+
+![](images/balance-success.png?raw=true)
+
+In case of Agency service is out of service, you wiill have something like this:
+![](images/balance-fallback.png?raw=true)
+
+
+And this proves that the fallback of Hystrix is working well.
+
+
+
+## Hystrix Service
+
+
+
+You could build and run this application follow below steps:
+As this service depends on Agency service, you may need to run Agency service first.
+- Go to agency-service directory
+```
+cd agency-service
+```
+- Compile with maven
+```
+mvn clean package
+```
+- Run this service
+```
+java -jar target/hystrix-dashboard-0.0.1-SNAPSHOT.jar
+```
+
+- Then you could test this service with below link:
+http://localhost:8030/hystrix
+
+And you will get something like this:
+![](images/hystrix0.png?raw=true)
+
+Next type in your turbine url "http://localhost:8031/turbine.stream" and click on monitor Stream
+
+![](images/hystrixdashboard.png?raw=true)
+
+In case of Agency service is out of service, you wiill have something like this:
+![](images/balance-fallback.png?raw=true)
+
+
+And this proves that the fallback of Hystrix is working well.
+
+## More details
+
+Below diagram explains the dependencies and communications of above services  
+![](images/comps.png?raw=true)
+
+
+### agency-service
 
 This service is nothing more than an ordinary spring boot application:
 For the data persistence a in-memory H2 database was used.     
@@ -118,28 +286,8 @@ spring:
     schema: classpath:schema.sql       
     data: classpath:data.sql
 ```
-You could build and run this application follow below  steps:
-- Go to agency-service directory
-```
-cd agency-service
-```
-- Compile with maven
-```
-mvn clean package
-```
-- Run this service
-```
-java -jar target/agency-service-0.0.1-SNAPSHOT.jar
-```
 
-- Then you could test this service with below link:
-http://localhost:8091/1
-
-And you will get something like this:
-
-![](images/agency.png?raw=true)
-
-## Salesdata Service
+###  Salesdata Service
 
 This service is nothing more than an ordinary spring boot application:
 For the data persistence a in-memory H2 database was used.     
@@ -198,28 +346,8 @@ spring:
     schema: classpath:schema.sql        
     data: classpath:data.sql
 ```
-You could build and run this application follow below  steps:
-- Go to agency-service directory
-```
-cd agency-service
-```
-- Compile with maven
-```
-mvn clean package
-```
-- Run this service
-```
-java -jar target/salesdata-service-0.0.1-SNAPSHOT.jar
-```
 
-- Then you could test this service with below link:
-http://localhost:8092/1
-
-And you will get something like this:
-
-![](images/sales.png?raw=true)
-
-## Balance Service
+###  Balance Service
 
 This service is nothing more than an ordinary spring boot application:
 For the data persistence a in-memory H2 database was used.     
@@ -307,36 +435,8 @@ agency-service:
   ribbon:
     listOfServers: localhost:8091
 ```
-You could build and run this application follow below steps:
-As this service depends on Agency service, you may need to run Agency service first.
-- Go to agency-service directory
-```
-cd agency-service
-```
-- Compile with maven
-```
-mvn clean package
-```
-- Run this service
-```
-java -jar target/balance-service-0.0.1-SNAPSHOT.jar
-```
 
-- Then you could test this service with below link:
-http://localhost:8081/agency/1
-
-And you will get something like this:
-
-![](images/balance-success.png?raw=true)
-
-In case of Agency service is out of service, you wiill have something like this:
-![](images/balance-fallback.png?raw=true)
-
-
-And this proves that the fallback of Hystrix is working well.
-
-## Risk Service
-
+###  Risk Service
 This service is nothing more than an ordinary spring boot application:
 For the data persistence a in-memory H2 database was used.     
 The following is the dependencies used in this project:
@@ -420,37 +520,8 @@ salesdata-service:
   ribbon:
     listOfServers: localhost:8092
 ```
-You could build and run this application follow below steps:
-As this service depends on Agency service, you may need to run Agency service first.
-- Go to agency-service directory
-```
-cd agency-service
-```
-- Compile with maven
-```
-mvn clean package
-```
-- Run this service
-```
-java -jar target/risk-service-0.0.1-SNAPSHOT.jar
-```
 
-- Then you could test this service with below link:
-http://localhost:8082/sales/1
-
-And you will get something like this:
-
-![](images/risk.png?raw=true)
-
-In case of Agency service is out of service, you wiill have something like this:
-![](images/riskfallback.png?raw=true)
-
-
-And this proves that the fallback of Hystrix is working well.
-
-
-## Turbine Service
-
+###  Turbine Service
 This service is nothing more than an ordinary spring boot application:
 For the data persistence a in-memory H2 database was used.     
 The following is the dependencies used in this project:
@@ -495,38 +566,7 @@ spring:
     username: guest
     password: guest
 ```
-You could build and run this application follow below steps:
-As this service depends on Agency service, you may need to run Agency service first.
-- Go to agency-service directory
-```
-cd agency-service
-```
-- Compile with maven
-```
-mvn clean package
-```
-- Run this service
-```
-java -jar target/hystrix-turbine-mq-0.0.1-SNAPSHOT.jar
-```
-
-- Then you could test this service with below link:
-http://localhost:8031/turbine.stream
-
-And you will get something like this:
-
-![](images/balance-success.png?raw=true)
-
-In case of Agency service is out of service, you wiill have something like this:
-![](images/balance-fallback.png?raw=true)
-
-
-And this proves that the fallback of Hystrix is working well.
-
-
-
-## Hystrix Service
-
+### Hystrix Service
 This service is nothing more than an ordinary spring boot application:
 For the data persistence a in-memory H2 database was used.     
 The following is the dependencies used in this project:
@@ -559,33 +599,3 @@ Here is the configuration in `application
 server:
   port: 8030
 ```
-You could build and run this application follow below steps:
-As this service depends on Agency service, you may need to run Agency service first.
-- Go to agency-service directory
-```
-cd agency-service
-```
-- Compile with maven
-```
-mvn clean package
-```
-- Run this service
-```
-java -jar target/hystrix-dashboard-0.0.1-SNAPSHOT.jar
-```
-
-- Then you could test this service with below link:
-http://localhost:8030/hystrix
-
-And you will get something like this:
-![](images/hystrix0.png?raw=true)
-
-Next type in your turbine url "http://localhost:8031/turbine.stream" and click on monitor Stream
-
-![](images/hystrixdashboard.png?raw=true)
-
-In case of Agency service is out of service, you wiill have something like this:
-![](images/balance-fallback.png?raw=true)
-
-
-And this proves that the fallback of Hystrix is working well.
